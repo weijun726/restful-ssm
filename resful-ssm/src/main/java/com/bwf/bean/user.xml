@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bwf.dao.IUserDao">
+
+	<!-- 删除-->
+	<delete id="deleteUser" parameterType="int">
+		delete from user1.t_user where tid=#{xx}
+	</delete>
+	
+	
+	<!-- 修改-->
+	<update id="updateUser" parameterType="com.bwf.bean.UserBean" >
+		update user1.t_user 
+		set 
+		<trim suffixOverrides=","><!-- suffixOverrides去掉最后一个逗号 -->
+            <if test="uname!=null and uname != ''">
+                uname=#{uname},
+            </if>
+            <if test="birthday!=null and birthday != ''">
+                birthday=to_date(#{birthday},'yyyy-MM-dd'),
+            </if>
+            <if test="money!=null">
+               money=#{money} 
+            </if>
+         </trim>
+         where tid=#{tid}
+	</update>
+
+	
+	<!-- 新增 -->
+	<insert id="addUser" parameterType="com.bwf.bean.UserBean" 
+	useGeneratedKeys="true" keyProperty="tid">
+		 <selectKey resultType="int" order="BEFORE" keyProperty="tid">  
+	     	select user1.seq_t_user.nextval from dual
+		  </selectKey>  
+		insert into user1.t_user(tid,
+		 <trim suffixOverrides=","><!-- suffixOverrides去掉最后一个逗号 -->
+            <if test="uname!=null and uname != ''">
+                uname,
+            </if>
+            <if test="birthday!=null and birthday != ''">
+                birthday,
+            </if>
+            <if test="money!=null">
+               money,
+            </if>
+         </trim>
+         )
+     values(
+         #{tid},
+        <trim suffixOverrides=","><!-- suffixOverrides去掉最后一个逗号 -->
+            <if test="uname!=null and uname != ''">
+                #{uname},
+            </if>
+            <if test="birthday!=null and birthday != ''">
+                to_date(#{birthday},'yyyy-MM-dd'),
+            </if>
+            <if test="money!=null">
+               #{money},
+            </if>
+        </trim>
+      )
+	</insert>
+	
+	<!-- 查询 -->
+	<select id="queryUser"  parameterType="com.bwf.bean.UserBean"  resultType="com.bwf.bean.UserBean">
+		select tid,uname,to_char(birthday,'yyyy-MM-dd') birthday, money from user1.t_user
+		<where>
+			<if test="tid!=null">
+               and tid = #{tid}
+            </if>
+			<if test="uname!=null and uname != ''">
+                and uname like ('%' || #{uname} || '%')
+            </if>		
+		</where>
+	</select>
+	
+</mapper>
